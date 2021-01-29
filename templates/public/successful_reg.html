@@ -6,7 +6,11 @@
     <div class="container">
         <h1>{{ _("Successfully created a new account for") }} {{ account }}!</h1>
         <br />
-        <a href="/login">{{ _("Click here to login") }} &raquo;</a>
+        {% if validate %}
+            {{ _("Please check your email for account validation") }}
+        {% else %}
+            <a href="/login">{{ _("Click here to login") }} &raquo;</a>
+        {% end %}
         <br />
     </div>
 {% end %}
