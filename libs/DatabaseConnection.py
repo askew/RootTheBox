@@ -102,7 +102,7 @@ class DatabaseConnection(object):
         logging.debug("Configured to use MySQL for a database")
         db_server, db_name, db_user, db_password = self._db_credentials()
         db_charset = "utf8mb4"
-        db_connection = "%s:%s@%s/%s?charset=%s" % (
+        db_connection = "%s:%s@%s/%s?charset=%s&ssl_ca=/opt/rtb/files/DigiCertGlobalRootG2.crt.pem" % (
             db_user,
             db_password,
             db_server,
