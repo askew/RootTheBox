@@ -1,0 +1,11 @@
+version: "3.0"
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - .:/home/rtbdev/code/:cached
+      - ${HOME}/.azure:/home/rtbdev/.azure:cached
+
+    command: /bin/sh -c "while sleep 1000; do :; done"

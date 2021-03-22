@@ -1,0 +1,20 @@
+{
+	"name": "rootthebox",
+	"dockerComposeFile": ["../docker-compose.yml", "docker-compose.dev.yml"],
+	"service": "webapp",
+	"workspaceFolder": "/home/rtbdev/code/",
+	"extensions": [
+		"ms-python.python",
+		"redhat.vscode-xml"
+	],
+	"forwardPorts": [ 8888 ],
+	"settings": {
+		"editor.fontFamily": "'Cascadia Mono SemiLight', Consolas, 'Courier New', monospace",
+		"terminal.integrated.cwd": "/home/rtbdev/code/",
+		"files.exclude": {
+			"**/.devcontainer": true,
+			"**/.vscode": true,
+			"**/.vs": true
+		}
+	}
+}
