@@ -416,6 +416,11 @@ define(
     help="links to add to the tool menu",
 )
 
+# Azure AD
+define("client_id", default="", group="azuread" )
+define("tenant_id", default="", group="azuread" )
+define("client_secret", default="", group="azuread" )
+
 # ReCAPTCHA
 define(
     "use_recaptcha",

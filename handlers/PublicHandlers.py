@@ -28,6 +28,8 @@ any authentication) with the exception of error handlers and the scoreboard
 import logging
 import re
 import smtplib
+import random
+import string
 
 from os import urandom
 from netaddr import IPAddress
@@ -38,6 +40,7 @@ from libs.XSSImageCheck import filter_avatars
 from libs.StringCoding import encode, decode
 from base64 import urlsafe_b64encode, urlsafe_b64decode, b64encode
 from builtins import str
+from models import azuread_app
 from models.Team import Team
 from models.Theme import Theme
 from models.PasswordToken import PasswordToken
@@ -50,7 +53,7 @@ from hashlib import sha256
 from datetime import datetime
 from pbkdf2 import PBKDF2
 from tornado.options import options
-
+from msal import ConfidentialClientApplication
 
 class HomePageHandler(BaseHandler):
     def get(self, *args, **kwargs):
@@ -60,17 +63,74 @@ class HomePageHandler(BaseHandler):
         else:
             self.render("public/home.html")
 
+class CodeFlowHandler(BaseHandler):
+
+    azuread_app = azuread_app
+
+    def get(self, *args, **kwargs):
+        """ Handles the OIDC code flow response """
+        state = args = self.get_argument("state")
+        code = self.get_argument("code")
+        code_flow = self.memcached.get(state)
+        args = {
+            "code": code,
+            "state": state
+        }
+        result = azuread_app.acquire_token_by_auth_code_flow(code_flow, args)
+        if "error" in result:
+            self.render("403.html", locked=False, xsrf=False)
+        
+        claims = result.get("id_token_claims")
+        alias = claims["preferred_username"].split("@")[0]
+
+        user = User.by_uuid(claims["oid"])
+        if user is None:
+            user = User()
+            user.handle = alias
+            user.password = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=30))
+            user.bank_password = False
+            user.name = claims["name"]
+            user.email = claims["email"]
+            user.theme = options.default_theme
+            user.last_login = datetime.now()
+            user.logins = 1
+            self.dbsession.add(user)
+            self.dbsession.commit()
+
+        self.start_session()
+        theme = Theme.by_id(user.theme_id)
+        if user.team is not None:
+            self.session["team_id"] = int(user.team.id)
+        self.session["user_id"] = int(user.id)
+        self.session["user_uuid"] = user.uuid
+        self.session["handle"] = user.handle
+        self.session["theme"] = [str(f) for f in theme.files]
+        self.session["theme_id"] = int(theme.id)
+        if user.is_admin():
+            self.session["menu"] = "admin"
+        else:
+            self.session["menu"] = "user"
+        self.session.save()
+
+        self.redirect("/")
 
 class LoginHandler(BaseHandler):
 
     """ Takes care of the login process """
+
+    azuread_app = azuread_app
 
     def get(self, *args, **kwargs):
         """ Display the login page """
         if self.session is not None:
             self.redirect("/user")
         else:
-            self.render("public/login.html", info=None, errors=None)
+            """
+            azuread_app.
+            """
+            code_flow = self.build_auth_code_flow()
+            self.memcached.add(code_flow["state"], code_flow)
+            self.redirect(code_flow["auth_uri"])
 
     @blacklist_ips
     def post(self, *args, **kwargs):
@@ -86,6 +146,10 @@ class LoginHandler(BaseHandler):
             if password_attempt is not None:
                 PBKDF2.crypt(password_attempt, "BurnTheHashTime")
             self.failed_login()
+
+    def build_auth_code_flow(self):
+        codeflow = azuread_app.initiate_auth_code_flow(["email"], redirect_uri="http://localhost:8888/oidc")
+        return codeflow
 
     def allowed_ip(self):
         return (

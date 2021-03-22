@@ -86,6 +86,7 @@ def get_cookie_secret():
 urls = [
     # Public handlers - PublicHandlers.py
     (r"/login", LoginHandler),
+    (r"/oidc", CodeFlowHandler),
     (r"/registration", RegistrationHandler),
     (r"/registration/token", ValidEmailHandler),
     (r"/reset", ForgotPasswordHandler),
