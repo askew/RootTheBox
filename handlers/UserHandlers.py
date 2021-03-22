@@ -77,8 +77,6 @@ class SettingsHandler(BaseHandler):
         post_functions = {
             "user_avatar": self.post_avatar,
             "team_avatar": self.post_team_avatar,
-            "password": self.post_password,
-            "bank_password": self.post_bankpassword,
             "theme": self.post_theme,
             "motto": self.post_motto,
             "email": self.post_email,
