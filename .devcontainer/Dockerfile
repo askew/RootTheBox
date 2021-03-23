@@ -1,12 +1,18 @@
 FROM python:3.8
 
+ADD [ "https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb", "/" ]
+
 RUN apt-get -qq update \
 	&& export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get -qq upgrade -y \
 	&& apt-get -qq install -y --no-install-recommends \
+		lsb-release \
 		build-essential \
 		zlib1g-dev \
 		python3-pycurl \
+	&& dpkg -i /mysql-apt-config_0.8.16-1_all.deb \
+	&& apt-get -qq update \
+	&& apt-get -qq install -y --no-install-recommends mysql-shell \
 	# Clean up
 	&& apt-get autoremove -y \
 	&& apt-get clean -y \
