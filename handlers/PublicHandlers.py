@@ -47,7 +47,8 @@ from models.PasswordToken import PasswordToken
 from models.RegistrationToken import RegistrationToken
 from models.EmailToken import EmailToken
 from models.GameLevel import GameLevel
-from models.User import User
+from models.User import User, ADMIN_PERMISSION
+from models.Permission import Permission
 from handlers.BaseHandlers import BaseHandler
 from hashlib import sha256
 from datetime import datetime
@@ -81,11 +82,16 @@ class CodeFlowHandler(BaseHandler):
             self.render("403.html", locked=False, xsrf=False)
         
         claims = result.get("id_token_claims")
+        roles = claims["roles"]
+        if not ("Player" in roles or "Admin" in roles) :
+            self.render("public/notingroup.html")
+
         alias = claims["preferred_username"].split("@")[0]
 
         user = User.by_uuid(claims["oid"])
         if user is None:
             user = User()
+            user.uuid = claims["oid"]
             user.handle = alias
             user.password = ''.join(random.choices(string.ascii_letters + string.digits + string.punctuation, k=30))
             user.bank_password = False
@@ -96,6 +102,21 @@ class CodeFlowHandler(BaseHandler):
             user.logins = 1
             self.dbsession.add(user)
             self.dbsession.commit()
+
+        """ Update permissions  """
+        if "Admin" in roles and not user.is_admin():
+            permission = Permission()
+            permission.name = ADMIN_PERMISSION
+            permission.user_id = user.id
+            user.team_id = None
+            self.dbsession.add(permission)
+        elif not "Admin" in roles and user.is_admin():
+            permissions = Permission.by_user_id(user.id)
+            for permission in permissions:
+                if permission.name == ADMIN_PERMISSION:
+                    self.dbsession.delete(permission)
+
+        self.dbsession.commit()
 
         self.start_session()
         theme = Theme.by_id(user.theme_id)
