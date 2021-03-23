@@ -40,7 +40,7 @@ from tornado.options import options
 
 class DatabaseConnection(object):
     def __init__(
-        self, database, hostname="", port="", username="", password="", dialect=""
+        self, database, hostname="", port="", username="", password="", dialect="", ssl_ca=""
     ):
         self.database = database
         self.hostname = hostname
@@ -48,6 +48,7 @@ class DatabaseConnection(object):
         self.username = username
         self.password = password
         self.dialect = dialect
+        self.ssl_ca = ssl_ca
 
     def __str__(self):
         """ Construct the database connection string """
@@ -102,13 +103,18 @@ class DatabaseConnection(object):
         logging.debug("Configured to use MySQL for a database")
         db_server, db_name, db_user, db_password = self._db_credentials()
         db_charset = "utf8mb4"
-        db_connection = "%s:%s@%s/%s?charset=%s&ssl_ca=/opt/rtb/files/DigiCertGlobalRootG2.crt.pem" % (
+        """ db_connection = "%s:%s@%s/%s?charset=%s&ssl_ca=/opt/rtb/files/DigiCertGlobalRootG2.crt.pem" % ( """
+        db_connection = "%s:%s@%s/%s?charset=%s" % (
             db_user,
             db_password,
             db_server,
             db_name,
             db_charset,
         )
+
+        if self.ssl_ca != "":
+            db_connection = db_connection + "&ssl_ca=" + self.ssl_ca
+
         codecs.register(
             lambda name: codecs.lookup("utf8") if name == "utf8mb4" else None
         )
