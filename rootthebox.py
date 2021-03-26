@@ -342,6 +342,13 @@ define(
 )
 
 define(
+    "auth",
+    default="db",
+    group="application",
+    help="The authentication mechanism, db (default) or Azure AD",
+)
+
+define(
     "avatar_dir",
     default="./files/avatars",
     group="application",
@@ -417,9 +424,10 @@ define(
 )
 
 # Azure AD
-define("client_id", default="", group="azuread" )
-define("tenant_id", default="", group="azuread" )
+define("client_id", default="00000000-0000-0000-0000-000000000000", group="azuread" )
+define("tenant_id", default="common", group="azuread" )
 define("client_secret", default="", group="azuread" )
+define("redirect_url", default="http://localhost:8888/oidc", group="azuread" )
 
 # ReCAPTCHA
 define(
@@ -463,6 +471,8 @@ define(
 define("sql_port", default=3306, group="database", help="database tcp port", type=int)
 
 define("sql_user", default="rtb", group="database", help="database username")
+
+define("sql_sslca", default="", group="database", help="SSL CA Cert for database server.")
 
 define(
     "sql_password",
@@ -965,6 +975,7 @@ if __name__ == "__main__":
             options.admin_ips = []  # Remove admin ips due to docker 127.0.0.1 mapping
             options.memcached = "memcached"
             options.x_headers = True
+            options_parse_environment()  # Pick up env vars before saving config file.
             save_config()
             setup()
         else:

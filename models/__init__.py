@@ -59,13 +59,17 @@ db_connection = DatabaseConnection(
     username=options.sql_user,
     password=options.sql_password,
     dialect=options.sql_dialect,
+    ssl_ca=options.sql_sslca,
 )
 
-azuread_app = ConfidentialClientApplication (
-    options.client_id,
-    authority = "https://login.microsoftonline.com/" + options.tenant_id,
-    client_credential = options.client_secret
-)
+if options.auth == "azuread":
+    azuread_app = ConfidentialClientApplication (
+        options.client_id,
+        authority = "https://login.microsoftonline.com/" + options.tenant_id,
+        client_credential = options.client_secret
+    )
+else:
+    azuread_app = None
 
 ### Setup the database session
 engine = create_engine(str(db_connection), pool_pre_ping=True)

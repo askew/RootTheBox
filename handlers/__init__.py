@@ -87,6 +87,8 @@ urls = [
     # Public handlers - PublicHandlers.py
     (r"/login", LoginHandler),
     (r"/oidc", CodeFlowHandler),
+    (r"/registration", RegistrationHandler),
+    (r"/registration/token", ValidEmailHandler),
     (r"/reset", ForgotPasswordHandler),
     (r"/reset/token", ResetPasswordHandler),
     (r"/about", AboutHandler),
@@ -261,6 +263,7 @@ def update_db(update=True):
         username=options.sql_user,
         password=options.sql_password,
         dialect=options.sql_dialect,
+        ssl_ca=options.sql_sslca,
     )
     alembic_cfg = Config("alembic/alembic.ini")
     alembic_cfg.attributes["configure_logger"] = False

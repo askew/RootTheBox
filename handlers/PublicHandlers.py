@@ -146,12 +146,12 @@ class LoginHandler(BaseHandler):
         if self.session is not None:
             self.redirect("/user")
         else:
-            """
-            azuread_app.
-            """
-            code_flow = self.build_auth_code_flow()
-            self.memcached.add(code_flow["state"], code_flow)
-            self.redirect(code_flow["auth_uri"])
+            if options.auth == "azuread":
+                code_flow = self.build_auth_code_flow()
+                self.memcached.add(code_flow["state"], code_flow)
+                self.redirect(code_flow["auth_uri"])
+            else:
+                self.render("public/login.html", info=None, errors=None)
 
     @blacklist_ips
     def post(self, *args, **kwargs):
@@ -171,7 +171,7 @@ class LoginHandler(BaseHandler):
             self.failed_login()
 
     def build_auth_code_flow(self):
-        codeflow = azuread_app.initiate_auth_code_flow(["email"], redirect_uri="http://localhost:8888/oidc")
+        codeflow = azuread_app.initiate_auth_code_flow(["email"], redirect_uri=options.redirect_url)
         return codeflow
 
     def allowed_ip(self):
