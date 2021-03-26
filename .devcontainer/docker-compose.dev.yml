@@ -8,13 +8,23 @@ services:
     volumes:
       - .:/home/rtbdev/code/:cached
       - ${HOME}/.azure:/home/rtbdev/.azure:cached
-
     command: /bin/sh -c "while sleep 1000; do :; done"
+    depends_on:
+      - mysql
+      - memcached
 
   mysql:
     image: mysql:8.0
     hostname: 'mysql'
+    command: >-
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --skip-name-resolve=OFF
+      --default-authentication-plugin=mysql_native_password
     ports:
       - "3306:3306"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=True
+      - MYSQL_DATABASE=rootthebox
+      - MYSQL_USER=rtb@mysql
+      - MYSQL_PASSWORD=A5VZicCa0fFG8p9D
