@@ -10,13 +10,17 @@ RUN apt-get -qq update \
 		build-essential \
 		zlib1g-dev \
 		python3-pycurl \
+	# MySQL Tools
 	&& dpkg -i /mysql-apt-config_0.8.16-1_all.deb \
 	&& apt-get -qq update \
-	&& apt-get -qq install -y --no-install-recommends mysql-shell \
+	&& apt-get -qq install -y --no-install-recommends \
+		mysql-shell \
+		mysql-client \
 	# Clean up
 	&& apt-get autoremove -y \
 	&& apt-get clean -y \
-	&& rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/* \
+	&& rm mysql-apt-config*.deb
 
 ADD ./setup/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt --upgrade && pip install --upgrade pylint
