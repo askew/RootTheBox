@@ -423,6 +423,14 @@ define(
     help="links to add to the tool menu",
 )
 
+define(
+    "passivesetup",
+    default=False,
+    group="application",
+    help="if setup fails, assume setup is not necessary and continue running",
+    type=bool,
+)
+
 # Azure AD
 define("client_id", default="00000000-0000-0000-0000-000000000000", group="azuread" )
 define("tenant_id", default="common", group="azuread" )
@@ -977,7 +985,16 @@ if __name__ == "__main__":
             options.x_headers = True
             options_parse_environment()  # Pick up env vars before saving config file.
             save_config()
-            setup()
+            try:
+                setup()
+            except:
+                if not options.passivesetup:
+                    raise
+                else:
+                    from models import dbsession
+                    dbsession.rollback()
+                    print(WARN + bold + "Database setup failed, but we are running in passive mode. We assume setup was not required and are continuing...")
+                    print(INFO + "If this is unexpected, clean up docker-compose environment with 'docker-compose down --rmi=all -v'")
         else:
             options.parse_config_file(options.config)
         options.start = True
@@ -998,6 +1015,10 @@ if __name__ == "__main__":
 
     # Make sure that cli args always have president over the file and env
     options.parse_command_line()
+
+    # Tornado transforms an empty list for admin_ips to literally '[]'
+    if len(options.admin_ips) == 1 and options.admin_ips[0] == '[]':
+       options.admin_ips = []
 
     if options.setup.lower()[:3] in ["pro", "dev"]:
         setup()

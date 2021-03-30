@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "python",
+            "request": "launch",
+            "name": "Python Launch",
+            "console": "integratedTerminal",
+            "program": "/home/rtbdev/code/rootthebox.py",
+            "args": [
+                "--save",
+                "--setup=docker",
+                "--passivesetup",
+                "--sql_dialect=mysql",
+                "--sql_host=mysql",
+                "--sql_user=rtb@mysql",
+                "--sql_password=A5VZicCa0fFG8p9D",
+                "--scoreboard_visibility=players",
+                "--memcached=memcached",
+                "--public_teams=False",
+                "--admin_ips=[]",
+                "--debug"
+            ]
+        }
+    ]
+}
