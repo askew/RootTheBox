@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "RootTheBox",
+            "type": "python",
+            "request": "launch",
+            "program": "rootthebox.py",
+            "args": [ "--start", "--debug" ],
+            "console": "integratedTerminal",
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "Starting RTB on http://localhost:([0-9]+)",
+                "uriFormat": "http://localhost:%s"
+            }
+        },
+        {
+            "name": "RootTheBox as container",
+            "type": "python",
+            "request": "launch",
+            "program": "rootthebox.py",
+            "args": [ "--setup=docker", "sql_dialect=mysql", "--debug" ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

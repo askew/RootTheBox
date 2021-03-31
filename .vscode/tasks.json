@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "MySQL Shell",
+            "type": "shell",
+            "command": "mysqlsh -h mysql -u root --no-password --sql --quiet-start=2 --schema=rootthebox",
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": false
+            },
+            "problemMatcher": []
+        }
+    ]
+}
