@@ -20,15 +20,14 @@
 	"postCreateCommand": [
 		"/usr/local/bin/python3",
 		"/home/rtbdev/code/rootthebox.py",
-		"--save",
+		"--setup=prod",
+		"--tests",
 		"--sql_dialect=mysql",
 		"--sql_host=mysql",
 		"--sql_user=rtb@mysql",
 		"--sql_password=A5VZicCa0fFG8p9D",
 		"--scoreboard_visibility=players",
 		"--memcached=memcached",
-		"--public_teams=False",
-		"--admin_ips=[]",
 		"--debug"
 	]
 }
