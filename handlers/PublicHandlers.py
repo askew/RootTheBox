@@ -109,7 +109,7 @@ class CodeFlowHandler(BaseHandler):
             user.last_login = datetime.now()
             user.logins = 1
             if not hasAdminRole:
-                team = Team.by_code(code_flow["teamcode"])
+                user.team = Team.by_code(code_flow["teamcode"])
             self.dbsession.add(user)
             self.dbsession.commit()
 
@@ -595,6 +595,7 @@ class JoinTeamHandler(BaseHandler):
             )
 
     def post(self, *args, **kwargs):
+        login_hint = None
         try:
             if self.application.settings["suspend_registration"]:
                 self.render("public/jointeam.html", errors=None, suspend=True)
@@ -616,6 +617,7 @@ class JoinTeamHandler(BaseHandler):
                 "public/jointeam.html",
                 errors=[str(error)],
                 suspend=self.application.settings["suspend_registration"],
+                login_hint=login_hint,
             )
 
     def validate_teamcode(self, teamcode):
