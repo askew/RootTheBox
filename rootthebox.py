@@ -999,6 +999,13 @@ if __name__ == "__main__":
     # Make sure that cli args always have president over the file and env
     options.parse_command_line()
 
+    # If authenticating with Azure AD (i.e. enterprise scenario) There's a few settings which 
+    # don't make sense, so force them to disabled.
+    if options.auth.lower() == 'azuread':
+        options.auth = 'azuread' # in-case it wasn't lower-case.AttributeError()
+        options.require_email = False
+        options.public_teams = False
+
     if options.setup.lower()[:3] in ["pro", "dev"]:
         setup()
     elif options.start:
