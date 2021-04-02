@@ -975,7 +975,8 @@ if __name__ == "__main__":
             + bold
             + "If necessary, update the db username and password in the cfg and set any advanced configuration options."
         )
-        os._exit(1)
+        if not options.setup:
+            os._exit(1)
     else:
         logging.debug("Parsing config file `%s`" % (os.path.abspath(options.config),))
         options.parse_config_file(options.config)
